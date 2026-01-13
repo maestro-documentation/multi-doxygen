@@ -16,7 +16,7 @@ jobs:
           pip install sphinx sphinx_rtd_theme myst_parser breathe exhale sphinx-breeze-theme
       - name: Build pinocchio doc
         run: |
-          cd src/stack/pinocchio ; mkdir build ; cd build ; cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_PYTHON_INTERFACE=OFF ; make doc -j12
+          cd src/stack/pinocchio && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_PYTHON_INTERFACE=OFF && make doc -j12
       - name: Sphinx build
         run: |
           sphinx-build doc public
