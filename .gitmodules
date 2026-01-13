@@ -1,0 +1,6 @@
+[submodule "src/stack/pinocchio"]
+	path = src/stack/pinocchio
+	url = git@github.com:maestro-documentation/pinocchio.git
+[submodule "src/stack/aligator"]
+	path = src/stack/aligator
+	url = git@github.com:maestro-documentation/aligator.git
