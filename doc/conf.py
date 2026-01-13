@@ -40,11 +40,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 breathe_projects = {
     "pinocchio": "../src/stack/pinocchio/build/doc/xml",
-    "aligator": "../src/stack/aligator/build/doc/xml",
  }
 
 # Optional: Set the default project for directives
-breathe_default_project = "aligator"
+breathe_default_project = "pinocchio"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -135,27 +134,7 @@ def configure_exhale_for_multiproject(app):
     exhale.environment.apply_sphinx_configurations(app)
     exhale.generate()
 
-    # Now configure Exhale for Aligator
-    aligator_args = {
-        "containmentFolder": "./api/aligator",
-        "rootFileName": "aligator_root.rst",
-        "doxygenStripFromPath": "../../src/stack/aligator",
-        "rootFileTitle": "Aligator API",
-        "createTreeView": True,
-        # Tell Exhale to only process Aligator's XML
-        "breathe_projects": {
-            "Aligator": "../src/stack/aligator/build/doc/xml/"
-        },
-        "breathe_default_project": "Aligator",
-        "exhaleExecutesDoxygen": False,
-        "verboseBuild": True,
-    }
-
-    # Configure and generate Aligator documentation
-    exhale.configs._exhale_args = aligator_args
-    exhale.generate()
-
-    print("Successfully generated separate API documentation for Pinocchio and Aligator")
+    print("Successfully generated separate API documentation for Pinocchio")
 
 
 def organize_api_by_namespace(app: Sphinx, exception):
@@ -174,12 +153,10 @@ def organize_api_by_namespace(app: Sphinx, exception):
 
     # Create subdirectories for each project
     pinocchio_dir = api_dir / 'pinocchio'
-    aligator_dir = api_dir / 'aligator'
     pinocchio_dir.mkdir(exist_ok=True)
-    aligator_dir.mkdir(exist_ok=True)
 
     # Move files based on their namespace
-    moved_count = {'pinocchio': 0, 'aligator': 0}
+    moved_count = {'pinocchio': 0}
 
     for rst_file in api_dir.glob('*.rst'):
         # Skip the root file and any index files
@@ -197,21 +174,11 @@ def organize_api_by_namespace(app: Sphinx, exception):
                 shutil.move(str(rst_file), str(dest))
                 moved_count['pinocchio'] += 1
 
-            elif 'namespacealigator' in rst_file.name or 'namespace_aligator' in rst_file.name or 'aligator::' in content:
-                # Move to aligator subdirectory
-                dest = aligator_dir / rst_file.name
-                shutil.move(str(rst_file), str(dest))
-                moved_count['aligator'] += 1
-
         except Exception as e:
             print(f"WARNING: Could not process {rst_file}: {e}")
 
     # Update the root file to point to the new locations
     update_root_file_references(api_dir / 'library_root.rst', moved_count)
-
-    print(f"API organization complete: {moved_count['pinocchio']} files -> pinocchio/, "
-          f"{moved_count['aligator']} files -> aligator/")
-
 
 
 def update_root_file_references(root_file_path, moved_count):
@@ -227,11 +194,8 @@ def update_root_file_references(root_file_path, moved_count):
         # Update references to moved files
         # This is a simple approach - you might need to adjust based on your specific structure
         content = content.replace('namespace_pinocchio', 'pinocchio/namespace_pinocchio')
-        content = content.replace('namespace_aligator', 'aligator/namespace_aligator')
         content = content.replace('classpinocchio_', 'pinocchio/classpinocchio_')
-        content = content.replace('classaligator_', 'aligator/classaligator_')
         content = content.replace('structpinocchio_', 'pinocchio/structpinocchio_')
-        content = content.replace('structaligator_', 'aligator/structaligator_')
 
         root_file_path.write_text(content, encoding='utf-8')
         print(f"Updated root file references: {root_file_path}")
